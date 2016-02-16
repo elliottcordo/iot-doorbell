@@ -3,6 +3,7 @@ from sseclient import SSEClient
 import json
 import pygame
 import os
+from time import sleep
 
 
 accessToken = 'xxx'
@@ -19,7 +20,6 @@ def parse_msg (msg):
     except:
         pass
 
-pygame.mixer.init(44100, -16, 2, 2048)
 
 def load_sound(sound_filename, directory):
     """load the sound file from the given directory"""
@@ -30,13 +30,17 @@ def load_sound(sound_filename, directory):
 sparkURL = 'https://api.particle.io/v1/devices/events/doorbell/?access_token=' + accessToken
 messages = SSEClient(sparkURL)
 
-doorbell = load_sound(bell_filename, sound_directory)
-
 for msg in messages:
     if msg:
         status = parse_msg(msg)
         if status == 'pressed':
+            print 'pressed'
+            pygame.mixer.init(44100, -16, 2, 2048)
+            doorbell = load_sound(bell_filename, sound_directory)
             doorbell.play()
+            sleep(5)
+            doorbell.fadeout(2)
+            pygame.mixer.quit()
 
 
         # pprint.pprint(data)
